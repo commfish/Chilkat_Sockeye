@@ -1,7 +1,0 @@
-     beta,   lnalpha,  lnalpha.c,    S.max,    S.eq.c,U.msy_Hilborn,S.msy_Hilborn, Smsy_lambert, Umsy_lambert
-Min.   :0.0000001242  ,Min.   :0.004655  ,Min.   :0.351  ,Min.   :  83855  ,Min.   :   75621  ,Min.   :0.1669  ,Min.   :  34563  ,Min.   :  34771  ,Min.   :0.1676  
-1st Qu.:0.0000038499  ,1st Qu.:0.847206  ,1st Qu.:1.083  ,1st Qu.: 158030  ,1st Qu.:  209719  ,1st Qu.:0.4595  ,1st Qu.:  85950  ,1st Qu.:  86464  ,1st Qu.:0.4625  
-Median :0.0000050913  ,Median :1.058384  ,Median :1.282  ,Median : 196413  ,Median :  248577  ,Median :0.5259  ,Median : 101401  ,Median : 101895  ,Median :0.5290  
-Mean   :0.0000051179  ,Mean   :1.049410  ,Mean   :1.302  ,Mean   : 256487  ,Mean   :  312674  ,Mean   :0.5233  ,Mean   : 125677  ,Mean   : 126539  ,Mean   :0.5263  
-3rd Qu.:0.0000063279  ,3rd Qu.:1.250510  ,3rd Qu.:1.485  ,3rd Qu.: 259750  ,3rd Qu.:  310746  ,3rd Qu.:0.5882  ,3rd Qu.: 128187  ,3rd Qu.: 129010  ,3rd Qu.:0.5911  
-Max.   :0.0000119254  ,Max.   :2.559386  ,Max.   :3.881  ,Max.   :8050385  ,Max.   :13956805  ,Max.   :0.8927  ,Max.   :3446225  ,Max.   :3596664  ,Max.   :0.9469  
