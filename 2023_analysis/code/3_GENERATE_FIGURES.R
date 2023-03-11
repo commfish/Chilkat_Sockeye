@@ -52,7 +52,7 @@ parameters <- read.csv("2023_analysis/output/rjags/parameters.csv")
 read.csv("2023_analysis/data/chilkat_sockeye.csv") %>%
 merge(., parameters, by=c("year"), all=TRUE)-> parameters
 xaxis = tickr(parameters, year, 4)
-read.csv("2023_anlayis/output/rjags/CI_Tah_Nat.csv")-> CI
+read.csv("2023_anlayis/output/rjags/CI.csv")-> CI
 
 # escapement-DIDSON
 options(scipen=999) 
@@ -219,14 +219,14 @@ ggplot(data,aes(x=year, y=p, fill=as.factor(Age))) +
     scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020)) -> plot1  
 
   
-  ggplot(data,aes(x=year, y=q, fill=as.factor(Age))) +
+ggplot(data,aes(x=year, y=q, fill=as.factor(Age))) +
     geom_area(position=position_stack(reverse=FALSE)) +
     scale_fill_grey(start=0.1, end=0.8) + 
     ylab("Age Composition Proportions") + xlab("") +
     theme(legend.title=element_blank(), legend.position="none") + geom_point(aes(x=year, y=age_comp), position='stack') +
     scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020)) -> plot2
   
-  ggplot(data,aes(x=year, y=Nya, fill=as.factor(Age))) +
+ggplot(data,aes(x=year, y=Nya, fill=as.factor(Age))) +
     geom_area(position=position_stack(reverse=FALSE)) + scale_fill_grey(start=0.1, end=0.8) +
     ylab("Terminal Run by Age")+xlab("Year") + 
     guides(fill = guide_legend(reverse=TRUE)) + 
@@ -239,7 +239,7 @@ plot_grid(plot1, plot2, plot3, labels = c("A", "B", "C"), ncol = 1, align="v",hj
             vjust=2, label_size=14)
 dev.off()
 
-# HORSETAIL PLOTS----
+# horsetail (spawner recruit) plots
 ggplot(data=CI, aes(x=Escapement, y=Median)) +
   geom_line(size=0.75, lty=2) +
   geom_ribbon(aes(ymin = q5, ymax = q95), alpha=.08) +
@@ -256,7 +256,7 @@ ggplot(data=CI, aes(x=Escapement, y=Median)) +
 cowplot::plot_grid(plot1,  align = "v", nrow = 1, ncol=1)
 ggsave("2023_analysis/figures/SR_curve.png", dpi = 500, height = 5, width = 8, units = "in")
 
-# density plot
+# density plots
 ggplot(coda, aes(x=S.msy.c, fill=Smsy, color = S.msy.c)) +
   geom_density(fill ="#999999", alpha=0.5) + 
   scale_color_manual(values=c("#999999")) +
