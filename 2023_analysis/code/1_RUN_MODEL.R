@@ -1,5 +1,5 @@
 # Chilkat sockeye state-space model
-# authors: 
+# authors: Sara Miller (ADF&G)
 # contact: sara.miller@alaska.gov; 
 # Last edited: March 2023
 # must download program JAGS for this script to work
@@ -16,9 +16,6 @@ library(runjags)
 library(R2OpenBUGS)
 library(mcmcplots)
 library(gsl)
-library(tibble)
-library(dplyr)
-library(tidyr)
 library(stringr)
 library(gdata)
 library(ggplot2)
@@ -31,14 +28,6 @@ library(fngr)
 library(extrafont)
 
 # STEP 1: CHOOSE SETTINGS----
-
-# if "test" runs then do sensitivity tests with "explore", and final run with "full"
-# rjags_Explore_BaseCase goes with rjags
-# R2Jags_Explore_BaseCase goes with R2jags
-out.label <-  "rjags_base_case" #"R2Jags_Explore_BaseCase" or #"rjags_Explore_BaseCase" # label to be used for the output folder (and for scenario comparisons)
-package.use <- "rjags"  #"rjags"  or "R2jags"
-jags.settings <- "test"  # "test" or "explore" or full" 
-
 # source the model file
 # this reads in a function called "mod" then writes the model to a text file to be called by JAGS if using rjags version
 # if used R2Jags, can just use the "mod" object directly
@@ -47,22 +36,20 @@ jags.settings <- "test"  # "test" or "explore" or full"
 #     out.label <-  "rjags_Explore_BaseCase" 
 #     package.use <- "rjags"  
 
+jags.settings <- "test"  # "test" or "explore" or full" 
+
 source("2023_analysis/code/model_source.R") 
 print(mod)
 model_file_loc=paste("2023_analysis/code/","chilkat_sockeye.txt", sep="") # where to write the model file
 write.model(mod, model_file_loc)
 
 # load custom functions
-source('2023_anlaysis/code/functions.R')
+source('2023_analysis/code/functions.R')
 source("2023_analysis/code/MCMC_CustomFunctions.R")
-
-# create output folder for model results
-out.path <- paste0("2023_analysis/output/", out.label)
-if(!exists(out.path)){dir.create(out.path)}
 
 # choices of model runs
 if(jags.settings == "test"){
-  n.adapt.use <- 100 ; n.iter.use <- 500;  n.burnin.use <- 100;   thin.use = 10
+  n.adapt.use <- 100 ; n.iter.use <- 1000;  n.burnin.use <- 100;   thin.use = 10
   by.use <- 10 # this is just for the progress bar
 }
 
@@ -86,16 +73,24 @@ source("2023_analysis/code/model_inits.R")
 
 # STEP 3: RUN THE MODEL AND PROCESS THE OUTPUT----
 # 2 options: rjags or R2jags
+# if "test" runs then do sensitivity tests with "explore", and final run with "full"
+# run the R2jags package and produced outputs based on rjags
+out.label <-  "R2Jags" # label to be used for the output folder (and for scenario comparisons)
+package.use <- "R2jags"
+
+# create output folder for model results
+out.path <- paste0("2023_analysis/output/", out.label)
+if(!exists(out.path)){dir.create(out.path)}
 
 # This step does the actual MCMC sampling. All subsequent steps
-# should just extract from "post" without rerunning the model
+# should just extract from "post" without rerunning the model.
 # These parameters must be the same as the conv.pars for the R2jags program to run
 parameters=c('S.eq.c','S.msy.c','U.msy.c','alpha','beta','alpha.c',
              'lnalpha','lnalpha.c','phi','sigma.R','log.resid.0', 'mean.log.RO',
              'S','R','N','log.resid','mu.hbelow','pi','h.below','N.ya',
              'p','q', 'S.max','D.sum','q.weir', 'q.mr','D.scale','sigma.RO',
              'log.qS.weir', 'log.qS.mr','qS.weir', 'qS.mr',
-             'S.eq.c2', 'U.msy.c2', 'S.msy.c2', 'U.max.c2 ')
+             'S.eq.c2', 'U.msy.c2', 'S.msy.c2', 'U.max.c2')
 
 # start the timer
 # R2jags
@@ -105,8 +100,6 @@ if(package.use == "R2jags"){ # new version
                    parameters.to.save = parameters, model.file = mod,
                    n.chains = 3, 
                    n.iter = n.iter.use + n.burnin.use ,  
-                   # NOTE: R2jags uses n.iter for the TOTAL Samples, and the first n.burnin are discarded)
-                   # rjags below does the n.burnin samples first, then n.iter samples to keep
                    n.burnin = n.burnin.use, 
                    n.thin = thin.use, DIC = T)
   end.jags <- proc.time()   # store time for MCMC
@@ -117,20 +110,20 @@ if(package.use == "R2jags"){ # new version
   write.csv(mcmc.samples[,c("beta","lnalpha","lnalpha.c")], file= paste0(out.path,"/coda.csv") ,row.names=FALSE)    # writes csv file
   write.csv(mcmc.summary, file= paste0(out.path,"/statsquants.csv"))    
   
-  # this one is the same as coda.csv, except with all params (~40MB) 
+  # this one is the same as coda.csv, except with all parameters 
   # - > not tracked in github
-  write.csv(mcmc.samples, file= paste0(out.path,"/coda_allpars.csv") ,row.names=FALSE)    # writes csv file
+  write.csv(mcmc.samples, file= paste0(out.path,"/coda_all_parameters.csv") ,row.names=FALSE)    # writes csv file
   
 # this only works for any single-value parameters
 # parameters with annual values would need to be tested individually (E.g. S[1], S[2], etc)
 #     -> build that later  
 conv.pars <- c('S.eq.c','S.msy.c','U.msy.c','alpha','beta',
-                  'lnalpha','lnalpha.c','phi','sigma.R',
-                  'S.eq.c2', 'U.msy.c2', 'S.msy.c2', 'U.max.c2','alpha.c')
+                 'lnalpha','lnalpha.c','phi','sigma.R',
+                 'S.eq.c2', 'U.msy.c2', 'S.msy.c2', 'U.max.c2','alpha.c')
   
 conv.details <- checkConvergence(mcmc.out = r2jags.out, vars.check = conv.pars)
 
-write.csv(conv.details,file=paste0(out.path,"/ConvergenceDetails_R2Jags.csv"), row.names=FALSE)
+write.csv(conv.details,file=paste0(out.path,"/convergence_details.csv"), row.names=FALSE)
 
 # for now, call it converged if gelman rubin and geweke are below critical values 
 # for all the conv.pars (the acf handling is finicky)
@@ -138,13 +131,18 @@ write.csv(conv.details,file=paste0(out.path,"/ConvergenceDetails_R2Jags.csv"), r
 conv.check <- !conv.details$Flag[conv.details$Check == "all.gelman.rubin"] & 
                    !conv.details$Flag[conv.details$Check == "all.geweke"]
 
-if(conv.check){print("The R2jags model run DID CONVERGE for all the key variables!")}
-if(!conv.check){print("The R2jags model run DID NOT CONVERGE for all the key variables!")}
-
-# run the script that generates all the outputs 
+if(conv.check){print("The R2jags model run converged for all the key variables!")}
+if(!conv.check){print("The R2jags model run did not converge for all the key variables!")}
 }
 
-# rjags
+# run the rjags package and produced outputs based on rjags
+out.label <-  "rjags" # label to be used for the output folder (and for scenario comparisons)
+package.use <- "rjags"
+
+# create output folder for model results
+out.path <- paste0("2023_analysis/output/", out.label)
+if(!exists(out.path)){dir.create(out.path)}
+
  if(package.use == "rjags"){
   parameters <- c('S.eq.c','S.msy.c','U.msy.c','alpha','beta','alpha.c',
                   'lnalpha','lnalpha.c','phi','sigma.R','log.resid.0', 'mean.log.RO',
@@ -160,8 +158,7 @@ if(!conv.check){print("The R2jags model run DID NOT CONVERGE for all the key var
 end.jags <- proc.time()   # store time for MCMC
 post.arr <- as.array(post) # convert to an accessible obj
 
-# run the script that generates all the outputs 
-source("2023_analysis/code/2_GENERATE_OUTPUTS.R")
+# run the script that generates all the outputs for rjags
 end.output  <- proc.time() 
 print("Jags took")
 print(end.jags - start.jags)
