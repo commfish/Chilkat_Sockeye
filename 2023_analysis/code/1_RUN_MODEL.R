@@ -31,12 +31,8 @@ library(extrafont)
 # source the model file
 # this reads in a function called "mod" then writes the model to a text file to be called by JAGS if using rjags version
 # if used R2Jags, can just use the "mod" object directly
-# if you get a dmulti error, then the age comps are not whole numbers
-# sensitivty analysis only used with:
-#     out.label <-  "rjags_Explore_BaseCase" 
-#     package.use <- "rjags"  
 
-jags.settings <- "test"  # "test" or "explore" or full" 
+jags.settings <- "explore"  # "test" or "explore" or full"  # choose iteration version (see code below for details)
 
 source("2023_analysis/code/model_source.R") 
 print(mod)
@@ -71,7 +67,7 @@ source("2023_analysis/code/model_data.R")
 # generates initial values
 source("2023_analysis/code/model_inits.R")
 
-# STEP 3: RUN THE MODEL AND PROCESS THE OUTPUT----
+# STEP 2: RUN THE MODEL AND PROCESS THE OUTPUT----
 # 2 options: rjags or R2jags
 # if "test" runs then do sensitivity tests with "explore", and final run with "full"
 # run the R2jags package and produced outputs based on rjags

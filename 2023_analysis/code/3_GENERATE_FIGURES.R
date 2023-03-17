@@ -52,7 +52,7 @@ parameters <- read.csv("2023_analysis/output/rjags/parameters.csv")
 read.csv("2023_analysis/data/chilkat_sockeye.csv") %>%
 merge(., parameters, by=c("year"), all=TRUE)-> parameters
 xaxis = tickr(parameters, year, 4)
-read.csv("2023_anlayis/output/rjags/CI.csv")-> CI
+read.csv("2023_analysis/output/rjags/CI.csv")-> CI
 
 # escapement-DIDSON
 options(scipen=999) 
