@@ -32,7 +32,7 @@ library(extrafont)
 # this reads in a function called "mod" then writes the model to a text file to be called by JAGS if using rjags version
 # if used R2Jags, can just use the "mod" object directly
 
-jags.settings <- "explore"  # "test" or "explore" or full"  # choose iteration version (see code below for details)
+jags.settings <- "full"  # "test" or "explore" or full"  # choose iteration version (see code below for details)
 
 source("2023_analysis/code/model_source.R") 
 print(mod)
