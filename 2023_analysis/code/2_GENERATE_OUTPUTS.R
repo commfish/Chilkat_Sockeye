@@ -85,10 +85,12 @@ rbind(coda1,coda2,coda3) %>%
 write.csv(., file= paste0(out.path,"/coda.csv") ,row.names=FALSE)  
 
 as.data.frame(read.csv("2023_analysis/output/rjags/coda.csv",header=T)) %>% 
-  mutate(Smsy_lambert = (1-lambert_W0(exp(1-lnalpha.c)))/beta,
-         Umsy_lambert = (1-lambert_W0(exp(1-lnalpha.c))))  %>%
+  mutate(Smsy_lambert.c = (1-lambert_W0(exp(1-lnalpha.c)))/beta,
+         Umsy_lambert.c = (1-lambert_W0(exp(1-lnalpha.c))),
+         Smsy_lambert = (1-lambert_W0(exp(1-lnalpha)))/beta,
+         Umsy_lambert = (1-lambert_W0(exp(1-lnalpha))))  %>%
   as.data.frame() %>%
-  dplyr::select(Smsy_lambert,Umsy_lambert) -> coda
+  dplyr::select(Smsy_lambert.c,Umsy_lambert.c,Smsy_lambert,Umsy_lambert) -> coda
 
 coda %>% 
   apply(., 2, sd) %>%

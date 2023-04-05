@@ -4,12 +4,13 @@
 # input values below based on stats output
 lowerB <- 70000  #lower bound of recommended escapement goal range
 upperB <- 150000 #upper bound of recommended escapement goal range
-SMSY <- 43857  #Lambert W from lambert file
-UMSY <- 0.75  #median from staquants file
-SMAX <- 59145  #median from staquants file
-SEQ <- 124106 #median from staquants file
-lnalpha.c <-  2.1115 #median from staquants file
-beta <-1.69076E-05  #median from staquants file
+SMSY <- 86250  #Lambert W from lambert file
+UMSY <- 0.47  #median from staquants file
+SMAX <- 185677 #median from staquants file
+SEQ <- 243495 #median from staquants file
+lnalpha.c <-  1.30 #median from staquants file
+lnalpha <-1.10
+beta <-5.39E-06  #median from staquants file
 
 # load----
 library(tidyverse)
@@ -20,7 +21,6 @@ library(scales)
 library(dplyr)
 library(extrafont)
 library(grid)
-library(FField)
 library("devtools")
 devtools::install_github("commfish/fngr")
 library(fngr)
@@ -36,16 +36,16 @@ if(!dir.exists(file.path("2023_analysis", "output", "rjags", "processed"))){dir.
 # loadfonts(device="win") #only need to do this once; takes awhile to run!
 coda <- read.csv("2023_analysis/output/rjags/coda.csv") 
 coda  %>%
-  mutate(S.eq.c = lnalpha.c/beta, 
-         S.msy.c = (1-lambert_W0(exp(1-lnalpha.c)))/beta, #Lambert W
-         R.msy.c = S.msy.c*exp(lnalpha.c-beta*S.msy.c), 
-         MSY.c = R.msy.c-S.msy.c, 
-         Umsy = (1-lambert_W0(exp(1-lnalpha.c))),
+  mutate(S.eq = lnalpha/beta, 
+         S.msy = (1-lambert_W0(exp(1-lnalpha)))/beta, #Lambert W
+         R.msy = S.msy*exp(lnalpha-beta*S.msy), 
+         MSY = R.msy-S.msy, 
+         Umsy = (1-lambert_W0(exp(1-lnalpha))),
          Rmax = exp(lnalpha)*(1/beta)*exp(-1)) -> coda
 
 # analysis----
 # create function for probability profiles and figures
-profile(i=10, z=500, xa.start=0, xa.end=700,lnalpha.c, beta) #can change i,z, xa.start, xa.end
+profile(i=10, z=500, xa.start=0, xa.end=700,lnalpha, beta) #can change i,z, xa.start, xa.end
 
 p_q_Nya <- read.csv("2023_analysis/output/rjags/p_q_Nya.csv")
 parameters <- read.csv("2023_analysis/output/rjags/parameters.csv")
@@ -257,7 +257,7 @@ cowplot::plot_grid(plot1,  align = "v", nrow = 1, ncol=1)
 ggsave("2023_analysis/figures/SR_curve.png", dpi = 500, height = 5, width = 8, units = "in")
 
 # density plots
-ggplot(coda, aes(x=S.msy.c, fill=Smsy, color = S.msy.c)) +
+ggplot(coda, aes(x=S.msy, fill=Smsy, color = S.msy)) +
   geom_density(fill ="#999999", alpha=0.5) + 
   scale_color_manual(values=c("#999999")) +
   scale_fill_manual(values=c("#999999")) +
