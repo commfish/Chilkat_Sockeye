@@ -38,11 +38,11 @@ mod=function(){
   S.max <- 1 / beta 
   alpha.c <- min(exp(lnalpha.c),1.0E4)
   S.eq.c <- lnalpha.c * S.max #Eq.21
+  S.eq <- lnalpha * S.max #Eq.21
   U.msy.c <- lnalpha.c * (0.5-0.07*lnalpha.c)
   S.msy.c <- S.eq.c *(0.5-0.07*lnalpha.c)  
-  # S.eq <- lnalpha * S.max #Eq.21 (no correction applied)
-  # U.msy <- lnalpha * (0.5-0.07*lnalpha) (no correction applied)
-  # S.msy <- S.eq *(0.5-0.07*lnalpha)  (no correction applied)
+  U.msy <- lnalpha * (0.5-0.07*lnalpha) #(no correction applied)
+  S.msy <- S.eq *(0.5-0.07*lnalpha)  #(no correction applied)
   
   positive.lna.c <- step(lnalpha.c)
   lnalpha.c.nonneg <- lnalpha.c * positive.lna.c
@@ -51,8 +51,6 @@ mod=function(){
   U.msy.c2 <- lnalpha.c.nonneg * peterman.approx.c 
   S.msy.c2 <- U.msy.c2 / beta  
   U.max.c2 <- 1 - 1 / exp(lnalpha.c.nonneg) 
-  
-  
   
   #GENERATE Y+A-1 = 42 MATURITY SCHEDULES, ONE PER BROOD YEAR USING THE DIRICHLET DISTRIB. (Eq.4-6)
   # "pi" (central tendency of "p"), and "D.scale" (dispersion of "p")

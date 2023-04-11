@@ -4,13 +4,13 @@
 # input values below based on stats output
 lowerB <- 70000  #lower bound of recommended escapement goal range
 upperB <- 150000 #upper bound of recommended escapement goal range
-SMSY <- 86250  #Lambert W from lambert file
-UMSY <- 0.47  #median from staquants file
-SMAX <- 185677 #median from staquants file
-SEQ <- 243495 #median from staquants file
-lnalpha.c <-  1.30 #median from staquants file
-lnalpha <-1.10
-beta <-5.39E-06  #median from staquants file
+SMSY <- 96257  #Lambert W from lambert file
+UMSY <- 0.52  #median from staquants file
+SMAX <- 184519 #median from staquants file
+SEQ <- 234223 #median from staquants file
+lnalpha.c <-  1.26 #median from staquants file
+lnalpha <-1.05
+beta <-5.42E-06  #median from staquants file
 
 # load----
 library(tidyverse)
@@ -34,18 +34,28 @@ if(!dir.exists(file.path("2023_analysis", "output", "rjags", "processed"))){dir.
 
 # data----
 # loadfonts(device="win") #only need to do this once; takes awhile to run!
-coda <- read.csv("2023_analysis/output/rjags/coda.csv") 
+# coda <- read.csv("2023_analysis/output/rjags/coda.csv") 
+# coda  %>%
+#   mutate(S.eq = lnalpha/beta, 
+#          S.msy = (1-lambert_W0(exp(1-lnalpha)))/beta, #Lambert W
+#          R.msy = S.msy*exp(lnalpha-beta*S.msy), 
+#          MSY = R.msy-S.msy, 
+#          Umsy = (1-lambert_W0(exp(1-lnalpha))),
+#          Rmax = exp(lnalpha)*(1/beta)*exp(-1)) -> coda
+
+# bias-adjusted version (need to adjust function to account for this)
+coda <- read.csv("2023_analysis/output/rjags/coda.csv")
 coda  %>%
-  mutate(S.eq = lnalpha/beta, 
-         S.msy = (1-lambert_W0(exp(1-lnalpha)))/beta, #Lambert W
-         R.msy = S.msy*exp(lnalpha-beta*S.msy), 
-         MSY = R.msy-S.msy, 
-         Umsy = (1-lambert_W0(exp(1-lnalpha))),
-         Rmax = exp(lnalpha)*(1/beta)*exp(-1)) -> coda
+  mutate(S.eq.c = lnalpha.c/beta,
+         S.msy.c = (1-lambert_W0(exp(1-lnalpha.c)))/beta, #Lambert W
+         R.msy.c = S.msy.c*exp(lnalpha.c-beta*S.msy.c),
+         MSY.c = R.msy.c-S.msy.c,
+         Umsy.c = (1-lambert_W0(exp(1-lnalpha.c))),
+         Rmax.c = exp(lnalpha.c)*(1/beta)*exp(-1)) -> coda
 
 # analysis----
 # create function for probability profiles and figures
-profile(i=10, z=500, xa.start=0, xa.end=700,lnalpha, beta) #can change i,z, xa.start, xa.end
+profile(i=10, z=500, xa.start=0, xa.end=700,lnalpha.c, beta) #can change i,z, xa.start, xa.end
 
 p_q_Nya <- read.csv("2023_analysis/output/rjags/p_q_Nya.csv")
 parameters <- read.csv("2023_analysis/output/rjags/parameters.csv")
@@ -54,25 +64,27 @@ merge(., parameters, by=c("year"), all=TRUE)-> parameters
 xaxis = tickr(parameters, year, 4)
 read.csv("2023_analysis/output/rjags/CI.csv")-> CI
 
+windowsFonts(Times=windowsFont("TT Times New Roman"))
+theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
+            theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())) 
+
 # escapement-DIDSON
 options(scipen=999) 
 parameters$S_val97.5pc <- as.numeric(parameters$S97.5.)
 parameters$S_val2.5pc <- as.numeric(parameters$S2.5.)
 parameters$S_median <- as.numeric(parameters$S50.)
 maxY<-max(parameters$S97.5., na.rm=TRUE)*1.5
-windowsFonts(Times=windowsFont("TT Times New Roman"))
-theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
-            theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()))
 parameters$year<-as.numeric(parameters$year)
 ggplot(parameters, aes(x=year, y=(S_median))) +
-geom_line(size=0.75)+ geom_point (size=2)+ylab("Escapement (S)")+xlab("Year") +
+  theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
+              theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+              theme(panel.background = element_rect(colour="white"))+theme(legend.position = "none") +
+              theme(panel.border = element_rect(colour = "black"))) +
+geom_line(size=0.75)+ ylab("Escapement (S)")+xlab("Year") +
 geom_line(aes(y=S_val2.5pc), colour="grey20", linetype="solid", size=0.1) +
   geom_ribbon(aes(ymin=(S_val2.5pc), ymax=(S_val97.5pc)), alpha=0.3, linetype="solid", size=0.5)+
-  theme(panel.background = element_rect(colour="white"))+
-  theme(panel.border = element_rect(colour = "black")) +
-scale_y_continuous(labels = comma,breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
+scale_y_continuous(labels = comma,breaks = seq(0, 500000, 100000), limits = c(0, 500000))+
 scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020))+
-theme(legend.position = "none") +
 geom_point(aes(y=DS), pch=21, size=3)-> plot1
 
 # escapement-weir
@@ -81,15 +93,16 @@ parameters$qS_weir_val2.5pc<-as.numeric(parameters$qS.weir2.5.)
 parameters$qS_weir_median<-as.numeric(parameters$qS.weir50.)
 maxY<-max(parameters$qS_weir_val97.5pc, na.rm=TRUE)*1.5
 ggplot(parameters, aes(x=year, y=(qS_weir_median))) +
-geom_line(size=0.75)+ geom_point (size=2)+ylab("Escapement (S)")+xlab("Year") +
+geom_line(size=0.75)+ ylab("Escapement (S)")+xlab("Year") +
 geom_line(aes(y=qS_weir_val2.5pc), colour="grey20", linetype="solid", size=0.1) +
   geom_ribbon(aes(ymin=(qS_weir_val2.5pc), ymax=(qS_weir_val97.5pc)), alpha=0.3, linetype="solid", size=0.5) +
-  theme(panel.background = element_rect(colour="white")) +
-  theme(panel.border = element_rect(colour = "black")) +
-scale_y_continuous(labels = comma,breaks = seq(0, 300000, 50000), limits = c(0, 300000))+
+scale_y_continuous(labels = comma,breaks = seq(0, 500000, 100000), limits = c(0, 500000))+
 scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020))+
-theme(legend.position = "none") +
-geom_point(aes(y=weir), pch=21, size=3)-> plot2
+geom_point(aes(y=weir), pch=21, size=3)+
+  theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
+              theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+              theme(panel.background = element_rect(colour="white"))+theme(legend.position = "none") +
+              theme(panel.border = element_rect(colour = "black")))  -> plot2
 
 # escapement-mark-recapture
 parameters$qS_mr_val97.5pc<-as.numeric(parameters$qS.mr97.5.)
@@ -97,14 +110,15 @@ parameters$qS_mr_val2.5pc<-as.numeric(parameters$qS.mr2.5.)
 parameters$qS_mr_median<-as.numeric(parameters$qS.mr50.)
 maxY<-max(parameters$qS_weir_val97.5pc, na.rm=TRUE)*1.5
 ggplot(parameters, aes(x=year, y=(qS_mr_median))) +
-geom_line(size=0.75)+ geom_point(size=2)+ylab("Escapement (S)")+xlab("Year") +
+  theme_set(theme_bw(base_size=12,base_family='Times New Roman')+
+              theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())+
+              theme(panel.background = element_rect(colour="white"))+theme(legend.position = "none") +
+              theme(panel.border = element_rect(colour = "black"))) +
+geom_line(size=0.75)+ ylab("Escapement (S)")+xlab("Year") +
 geom_line(aes(y=qS_mr_val2.5pc), colour="grey20", linetype="solid", size=0.1) +
   geom_ribbon(aes(ymin=(qS_mr_val2.5pc), ymax=(qS_mr_val97.5pc)), alpha=0.3, linetype="solid", size=0.5)+
-  theme(panel.background = element_rect(colour="white")) +
-  theme(panel.border = element_rect(colour = "black")) +
-scale_y_continuous(labels = comma,breaks = seq(0, 500000, 50000), limits = c(0, 500000))+
+scale_y_continuous(labels = comma,breaks = seq(0, 500000, 100000), limits = c(0, 500000))+
 scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020))+                  
-theme(legend.position = "none") +
 geom_point(aes(y=mr), pch=21, size=3) -> plot3
 
 png(file='2023_analysis/figures/escapement.png', res=200, width=8, height=9, units ="in") 
@@ -120,12 +134,17 @@ maxY<-max(parameters$S_val97.5pc, na.rm=TRUE)*1.5
 ggplot(parameters, aes(x=year, y=(S_median))) +
 geom_line(size=0.75)+ geom_point (size=2)+ylab("Escapement (S)")+xlab("Year") +
 geom_line(aes(y=S_val2.5pc), colour="grey70", linetype="dotted", size=0.5) +
-  geom_ribbon(aes(ymin=(S_val2.5pc), ymax=(S_val97.5pc)), alpha=0.3, colour="grey70", linetype="dotted", size=0.5) +
-  theme(panel.background = element_rect(colour="white")) +
-  theme(panel.border = element_rect(colour = "black")) +
+geom_ribbon(aes(ymin=(S_val2.5pc), ymax=(S_val97.5pc)), alpha=0.3, colour="grey70", linetype="dotted", size=0.5) +
+  theme(legend.key = element_blank()) +
+  theme_bw()+theme(legend.title=element_blank(),
+                   legend.justification=c(0,1), 
+                   legend.position=c(0.7,0.5),  
+                   legend.background = element_blank(),
+                   legend.key = element_blank(),text=element_text(family="Times New Roman"),
+                   panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(legend.position = "none") +
 scale_y_continuous(labels = comma,breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
 scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020))+                      
-theme(legend.position = "none") +
 geom_line(aes(y=upperB), colour="grey70", size=1, linetype=2) +
 geom_line(aes(y=lowerB), colour="grey70", size=1, linetype=2) + 
 geom_line(aes(y=SMSY), colour="grey70", size=1, linetype=3) -> plot4
@@ -143,10 +162,10 @@ maxY<-max(parameters$R_val97.5pc, na.rm=TRUE)*1.5
 ggplot(parameters, aes(x=year, y=(R_median)))+geom_line(size=0.75)+ geom_point (size=2)+ylab("Recruitment (R)")+xlab("Year") +
 geom_line(aes(y=R_val2.5pc), colour="grey70", linetype="dotted", size=0.5) +
   geom_line(aes(y=R_val97.5pc), colour="grey70", linetype="dotted", size=0.5) +
-  geom_ribbon(aes(ymin=R_val2.5pc, ymax=R_val97.5pc), alpha=0.3) +
+  geom_ribbon(aes(ymin=R_val2.5pc, ymax=R_val97.5pc), alpha=0.15) +
   theme(panel.background = element_rect(colour="white")) +
   theme(panel.border = element_rect(colour = "black")) +
-scale_y_continuous(labels = comma,breaks = seq(0, 500000, 50000), limits = c(0, 500000))+
+scale_y_continuous(labels = comma,breaks = seq(0, 500000, 100000), limits = c(0, 500000))+
 scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020))+
 theme(legend.position = "none") -> fig_a
 
@@ -160,7 +179,7 @@ geom_line(aes(y=parameters$N_val2.5pc), colour="grey70", linetype="dotted", size
   geom_ribbon(aes(ymin=N_val2.5pc, ymax=N_val97.5pc), alpha=0.15) +
   theme(panel.background = element_rect(colour="white")) +
   theme(panel.border = element_rect(colour = "black")) +
-scale_y_continuous(labels = comma,breaks = seq(0, 500000, 50000), limits = c(0, 500000))+
+scale_y_continuous(labels = comma,breaks = seq(0, 500000, 100000), limits = c(0, 500000))+
 scale_x_continuous(breaks = xaxis$breaks, labels = xaxis$labels, limits = c(1973, 2020))+               
 theme(legend.position = "none") -> fig_b
 
@@ -175,7 +194,7 @@ ggplot(parameters, aes(x=year, y=log.resid_median))+geom_line(size=0.75)+geom_po
 geom_line(aes(y=log.resid_val2.5pc), colour="grey70", linetype="dotted", size=0.5) +
   geom_line(aes(y=log.resid_val97.5pc), colour="grey70", linetype="dotted", size=0.5) +
   geom_line(aes(y=log.resid_val2.5pc), colour="grey70", linetype="dotted", size=0.5) +
-  geom_ribbon(aes(ymin=log.resid_val2.5pc, ymax=log.resid_val97.5pc), alpha=0.3) +
+  geom_ribbon(aes(ymin=log.resid_val2.5pc, ymax=log.resid_val97.5pc), alpha=0.15) +
   theme(panel.background = element_rect(colour="white")) +
   theme(panel.border = element_rect(colour = "black")) +
   geom_line(aes(y=0), colour="grey70", size=1, linetype=2) +
@@ -190,7 +209,7 @@ parameters$mu.hbelow<-as.numeric(parameters$mu.hbelow50.)
 ggplot(parameters, aes(x=year, y=parameters$mu.hbelow))+geom_line(size=0.75) + geom_point (size=2)+ ylab("Harvest Rate")+xlab("Year") +
 geom_line(aes(y=mu.hbelow_val2.5pc), colour="grey70", linetype="dotted", size=0.5) +
   geom_line(aes(y=mu.hbelow_val97.5pc), colour="grey70", linetype="dotted", size=0.5) +
-  geom_ribbon(aes(ymin=mu.hbelow_val2.5pc, ymax=parameters$mu.hbelow_val97.5pc), alpha=0.3) +
+  geom_ribbon(aes(ymin=mu.hbelow_val2.5pc, ymax=parameters$mu.hbelow_val97.5pc), alpha=0.15) +
   theme(panel.background = element_rect(colour="white")) +
   theme(panel.border = element_rect(colour = "black")) +
 coord_cartesian(ylim=c(0,1))+
@@ -257,25 +276,24 @@ cowplot::plot_grid(plot1,  align = "v", nrow = 1, ncol=1)
 ggsave("2023_analysis/figures/SR_curve.png", dpi = 500, height = 5, width = 8, units = "in")
 
 # density plots
-ggplot(coda, aes(x=S.msy, fill=Smsy, color = S.msy)) +
+ggplot(coda, aes(x=S.msy.c, fill=Smsy, color = S.msy.c)) +
   geom_density(fill ="#999999", alpha=0.5) + 
   scale_color_manual(values=c("#999999")) +
   scale_fill_manual(values=c("#999999")) +
-  geom_vline(xintercept = 43857,linetype = "longdash" ) +
+  geom_vline(xintercept = SMSY,linetype = "longdash" ) +
   labs(x="Smsy",y="Density") + theme_set(theme_bw(base_size=14,base_family=
                                                     'Arial')+
                                            theme(panel.grid.major = element_blank(),
                                                  panel.grid.minor = element_blank())) + theme(legend.position="none")+ 
   scale_x_continuous(labels = comma,breaks = seq(0, 200000, 25000), limits = c(0, 200000)) -> plot1
 
-ggplot(coda, aes(x=Umsy, fill=Umsy)) +
+ggplot(coda, aes(x=Umsy.c, fill=Umsy.c)) +
   geom_density(fill ="#999999", alpha=0.5)+ 
   scale_color_manual(values=c("#999999"))+
-  scale_fill_manual(values=c("#999999"))+geom_vline(xintercept = 0.75,linetype = "longdash" ) +
-  labs(x="Umsy",y="Density") + theme_set(theme_bw(base_size=14,base_family=
-                                                    'Arial')+
-                                           theme(panel.grid.major = element_blank(),
-                                                 panel.grid.minor = element_blank())) + theme(legend.position="none")+ 
+  scale_fill_manual(values=c("#999999"))+geom_vline(xintercept = UMSY,linetype = "longdash" ) +
+  labs(x="Umsy",y="Density") + theme_set(theme_bw(base_size=14,base_family='Arial') +
+                                           theme(panel.grid.major = element_blank(),panel.grid.minor = element_blank())) + 
+  theme(legend.position="none") + 
   scale_x_continuous(breaks = seq(0, 1, 0.25), limits = c(0, 1)) -> plot2
 
 png(file='2023_analysis/figures/density.png', res=200, width=8, height=11, units ="in") 

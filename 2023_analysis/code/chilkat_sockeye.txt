@@ -33,8 +33,11 @@ model
     S.max <- 1/beta
     alpha.c <- min(exp(lnalpha.c), 10000)
     S.eq.c <- lnalpha.c * S.max
+    S.eq <- lnalpha * S.max
     U.msy.c <- lnalpha.c * (0.5 - 0.07 * lnalpha.c)
     S.msy.c <- S.eq.c * (0.5 - 0.07 * lnalpha.c)
+    U.msy <- lnalpha * (0.5 - 0.07 * lnalpha)
+    S.msy <- S.eq * (0.5 - 0.07 * lnalpha)
     positive.lna.c <- step(lnalpha.c)
     lnalpha.c.nonneg <- lnalpha.c * positive.lna.c
     S.eq.c2 <- lnalpha.c.nonneg * S.max

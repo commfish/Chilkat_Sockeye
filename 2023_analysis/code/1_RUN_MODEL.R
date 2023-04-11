@@ -81,7 +81,7 @@ if(!exists(out.path)){dir.create(out.path)}
 # This step does the actual MCMC sampling. All subsequent steps
 # should just extract from "post" without rerunning the model.
 # These parameters must be the same as the conv.pars for the R2jags program to run
-parameters=c('S.eq.c','S.msy.c','U.msy.c','alpha','beta','alpha.c',
+parameters=c('S.eq.c','S.eq','S.msy.c','S.msy', 'U.msy.c','U.msy','alpha','beta','alpha.c',
              'lnalpha','lnalpha.c','phi','sigma.R','log.resid.0', 'mean.log.RO',
              'S','R','N','log.resid','mu.hbelow','pi','h.below','N.ya',
              'p','q', 'S.max','D.sum','q.weir', 'q.mr','D.scale','sigma.RO',
@@ -113,7 +113,7 @@ if(package.use == "R2jags"){ # new version
 # this only works for any single-value parameters
 # parameters with annual values would need to be tested individually (E.g. S[1], S[2], etc)
 #     -> build that later  
-conv.pars <- c('S.eq.c','S.msy.c','U.msy.c','alpha','beta',
+conv.pars <- c('S.eq.c','S.eq','S.msy.c','S.msy', 'U.msy.c','U.msy','alpha','beta',
                  'lnalpha','lnalpha.c','phi','sigma.R',
                  'S.eq.c2', 'U.msy.c2', 'S.msy.c2', 'U.max.c2','alpha.c')
   
@@ -140,7 +140,7 @@ out.path <- paste0("2023_analysis/output/", out.label)
 if(!exists(out.path)){dir.create(out.path)}
 
  if(package.use == "rjags"){
-  parameters <- c('S.eq.c','S.msy.c','U.msy.c','alpha','beta','alpha.c',
+  parameters <- c('S.eq.c','S.eq','S.msy.c','S.msy', 'U.msy.c','U.msy', 'alpha','beta','alpha.c',
                   'lnalpha','lnalpha.c','phi','sigma.R','log.resid.0', 'mean.log.RO',
                   'S','R','N','log.resid','mu.hbelow','pi','h.below','N.ya',
                   'p','q', 'S.max','D.sum','q.weir', 'q.mr','D.scale','sigma.RO',

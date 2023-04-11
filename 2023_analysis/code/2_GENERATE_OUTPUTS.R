@@ -3,7 +3,7 @@ loadfonts(device="win")
 windowsFonts(Times=windowsFont("Arial"))
 theme_set(theme_report(base_size = 14))
 
-parameters <- c('S.eq.c','S.msy.c','U.msy.c','alpha','beta','alpha.c',
+parameters <- c('S.eq.c','S.eq','S.msy.c','S.msy', 'U.msy.c','U.msy', 'alpha','beta','alpha.c',
                   'lnalpha','lnalpha.c','phi','sigma.R','log.resid.0', 'mean.log.RO',
                   'S','R','N','log.resid','mu.hbelow','pi','h.below','N.ya',
                   'p','q', 'S.max','D.sum','q.weir', 'q.mr','D.scale','sigma.RO',
@@ -91,7 +91,7 @@ as.data.frame(read.csv("2023_analysis/output/rjags/coda.csv",header=T)) %>%
          Umsy_lambert = (1-lambert_W0(exp(1-lnalpha))))  %>%
   as.data.frame() %>%
   dplyr::select(Smsy_lambert.c,Umsy_lambert.c,Smsy_lambert,Umsy_lambert) -> coda
-
+write.csv(coda, file= paste0(out.path,"/coda_test.csv") ,row.names=FALSE)  
 coda %>% 
   apply(., 2, sd) %>%
   as.data.frame()%>%
