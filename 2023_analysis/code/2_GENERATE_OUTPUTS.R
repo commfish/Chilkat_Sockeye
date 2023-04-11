@@ -257,8 +257,8 @@ data.frame(stats) %>%
   dplyr::select(-c(variable)) -> df
 new.df <- data.frame(
   # brood year plus two prior years
-  year = c(1970:2012, 1970:2012, 1970:2012),  # need to adjust with new analysis (start with earlier year, and then add two prior years)
-  age = rep(c("Ages 2-4", "Age 5", "Ages 6-8"), each = 43)) # brood years + 3
+  year = c(1970:2018, 1970:2018, 1970:2018),  # need to adjust with new analysis (start with earlier year, and then add two prior years)
+  age = rep(c("Ages 2-4", "Age 5", "Ages 6-8"), each = 49)) # brood years + 3
 p_data <- cbind(df, new.df)
 
 summary <- summary(post) # extract q
@@ -269,6 +269,7 @@ data.frame(stats) %>%
   filter(str_detect(variable, "q")) %>% 
   filter(!str_detect(variable, "S.eq.c")) %>% # filter out other variables besides q
   filter(!str_detect(variable, "S.eq.c2")) %>%
+  filter(!str_detect(variable, "S.eq")) %>%
   filter(!str_detect(variable, "log.qS.weir")) %>%
   filter(!str_detect(variable, "log.qS.mr")) %>%
   filter(!str_detect(variable, "q.mr")) %>%
@@ -280,8 +281,8 @@ data.frame(stats) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
 # calendar year
-  year = c(1976:2016, 1976:2016, 1976:2016),
-  age = rep(c("Ages 2-4", "Age 5", "Ages 6-8"), each = 41))
+  year = c(1976:2022, 1976:2022, 1976:2022),
+  age = rep(c("Ages 2-4", "Age 5", "Ages 6-8"), each = 47))
 q_data <- cbind(df, new.df)
 
 summary <- summary(post) # extract N.ya
@@ -306,7 +307,7 @@ data.frame(quants) %>%
   rownames_to_column('variable') -> quants
 
 new.df <- data.frame(
-  year = rep(c(1976:2016),1))
+  year = rep(c(1976:2022),1))
 
 quants %>%
   filter(str_detect(variable, "h.below")) %>% 
@@ -326,9 +327,11 @@ quants %>%
   filter(str_detect(variable, "S")) %>% 
   filter(!str_detect(variable, "S.eq.c")) %>%
   filter(!str_detect(variable, " S.eq.c2")) %>%
+  filter(!str_detect(variable, "S.eq")) %>%
   filter(!str_detect(variable, "S.max")) %>%
   filter(!str_detect(variable, "S.msy.c")) %>%
   filter(!str_detect(variable, "S.msy.c2")) %>%
+  filter(!str_detect(variable, "S.msy")) %>%
   filter(!str_detect(variable, "log.qS.mr")) %>%
   filter(!str_detect(variable, "log.qS.weir")) %>%
   filter(!str_detect(variable, "qS.mr")) %>%
@@ -353,7 +356,7 @@ quants %>%
             funs(str_replace(., "X", "log.resid"))) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
-  year = rep(c(1976:2012),1))
+  year = rep(c(1976:2018),1))
 df5 <- cbind(df, new.df)
 
 quants %>%
@@ -365,7 +368,7 @@ quants %>%
             funs(str_replace(., "X", "R"))) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
-  year = rep(c(1970:2012),1))
+  year = rep(c(1970:2018),1))
 df6 <- cbind(df, new.df)
 
 quants %>%
@@ -374,7 +377,7 @@ quants %>%
             funs(str_replace(., "X", "log.qS.mr"))) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
-  year = rep(c(1976:2016),1))
+  year = rep(c(1976:2022),1))
 df7 <- cbind(df, new.df)
 
 quants %>%
@@ -383,9 +386,8 @@ quants %>%
             funs(str_replace(., "X", "log.qS.weir"))) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
-  year = rep(c(1976:2016),1))
+  year = rep(c(1976:2022),1))
 df8 <- cbind(df, new.df)
-
 
 quants %>%
   filter(str_detect(variable, "qS.weir")) %>%
@@ -394,9 +396,8 @@ quants %>%
             funs(str_replace(., "X", "qS.weir"))) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
-  year = rep(c(1976:2016),1))
+  year = rep(c(1976:2022),1))
 df9 <- cbind(df, new.df)
-
 
 quants %>%
   filter(str_detect(variable, "qS.mr")) %>%
@@ -405,7 +406,7 @@ quants %>%
             funs(str_replace(., "X", "qS.mr"))) %>%
   dplyr::select(-c(variable))-> df
 new.df <- data.frame(
-  year = rep(c(1976:2016),1))
+  year = rep(c(1976:2022),1))
 df10 <- cbind(df, new.df)
 
 merge(df1, df2, by=c("year"), all=TRUE) %>%
@@ -436,7 +437,7 @@ ggplot(Smsy, aes(x=Smsy, fill=Smsy, color = Smsy)) +
   geom_density(fill ="#999999", alpha=0.5)+ annotate("text",x = 0, y=0.00004, label="a)", family="Arial" ,size=6) +
   scale_color_manual(values=c("#999999"))+
   scale_fill_manual(values=c("#999999"))+
-  geom_vline(xintercept = 43857,linetype = "longdash" ) +
+  geom_vline(xintercept = 96257,linetype = "longdash" ) +
   labs(x="Smsy",y="Density") + theme_set(theme_bw(base_size=14,base_family=
                                              'Arial')+
                                     theme(panel.grid.major = element_blank(),
@@ -446,12 +447,13 @@ ggplot(Smsy, aes(x=Smsy, fill=Smsy, color = Smsy)) +
 ggplot(Umsy, aes(x=Umsy, fill=Umsy)) +
   geom_density(fill ="#999999", alpha=0.5)+ annotate("text",x = 0, y=5, label="b)", family="Arial" ,size=6) +
   scale_color_manual(values=c("#999999"))+
-  scale_fill_manual(values=c("#999999"))+geom_vline(xintercept = 0.75,linetype = "longdash" ) +
+  scale_fill_manual(values=c("#999999"))+geom_vline(xintercept = 0.52,linetype = "longdash" ) +
   labs(x="Umsy",y="Density") + theme_set(theme_bw(base_size=14,base_family=
                                                       'Arial')+
                                              theme(panel.grid.major = element_blank(),
                                                    panel.grid.minor = element_blank())) + theme(legend.position="none")+ 
   scale_x_continuous(breaks = seq(0, 1, 0.25), limits = c(0, 1)) -> plot2
+
 cowplot::plot_grid(plot1,plot2,  align = "v", nrow = 2, ncol=1) 
 ggsave(out.file, dpi = 500, height = 8, width = 9, units = "in")
 
