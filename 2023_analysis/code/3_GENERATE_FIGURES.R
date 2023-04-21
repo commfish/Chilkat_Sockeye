@@ -236,9 +236,9 @@ ggplot(data=CI, aes(x=Escapement, y=Median)) +
   scale_x_continuous(labels = comma,breaks = seq(0, 350000, 50000), limits = c(0, 350000)) +
   geom_line(aes(x=Escapement, y=Escapement),linetype="solid", size=0.75, color ="black") +
   geom_point(data=parameters, aes(x=S_median, y=R_median),pch=1, size=2) +
-  geom_point(data=parameters_fig, aes(x=S_median, y=R_median),pch=16, size=2.5) +
-  geom_text(size=3, data=parameters_fig, aes(x=S_median, y=R_median, label=year,family="serif",
-                                             hjust = -0.1, vjust= -0.4)) -> plot1
+  geom_point(data=parameters_fig, aes(x=S_median, y=R_median),pch=16, size=3) -> plot1
+  #geom_text(size=3, data=parameters_fig, aes(x=S_median, y=R_median, label=year,family="serif",
+   #                                          hjust = -0.1, vjust= -0.4)) -> plot1
 cowplot::plot_grid(plot1,  align = "v", nrow = 1, ncol=1)
 ggsave("2023_analysis/figures/SR_curve.png", dpi = 500, height = 5, width = 8, units = "in")
 

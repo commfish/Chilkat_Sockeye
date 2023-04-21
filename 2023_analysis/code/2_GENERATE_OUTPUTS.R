@@ -90,8 +90,8 @@ as.data.frame(read.csv("2023_analysis/output/rjags/coda.csv",header=T)) %>%
          Smsy_lambert = (1-lambert_W0(exp(1-lnalpha)))/beta,
          Umsy_lambert = (1-lambert_W0(exp(1-lnalpha))))  %>%
   as.data.frame() %>%
-  dplyr::select(Smsy_lambert.c,Umsy_lambert.c,Smsy_lambert,Umsy_lambert) -> coda
-write.csv(coda, file= paste0(out.path,"/coda_test.csv") ,row.names=FALSE)  
+  dplyr::select(Smsy_lambert.c,Umsy_lambert.c,Smsy_lambert,Umsy_lambert, beta, lnalpha.c) -> coda
+write.csv(coda, file= paste0(out.path,"/coda_output_lambert.csv") ,row.names=FALSE)  
 coda %>% 
   apply(., 2, sd) %>%
   as.data.frame()%>%
