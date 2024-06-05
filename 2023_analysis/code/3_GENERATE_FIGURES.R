@@ -28,7 +28,7 @@ source('2023_analysis/code/functions.r')
 #extrafont::font_import()
 
 
-windowsFonts(Times=windowsFont("Times New Roman"))
+windowsFonts(Times=windowsFont("TT Times New Roman"))
 theme_set(theme_report(base_size = 14))
 if(!dir.exists(file.path("2023_analysis", "output", "rjags", "processed"))){dir.create(file.path("2023_analysis", "output", "rjags", "processed"))}
 
@@ -227,20 +227,20 @@ parameters_fig$S_median<-as.numeric(parameters_fig$S50.)
 
 ggplot(data=CI, aes(x=Escapement, y=Median)) +
   geom_line(size=0.75, lty=2) +
-  geom_ribbon(aes(ymin = q5, ymax = q95), alpha=.05) +
-  geom_ribbon(aes(ymin = q10, ymax = q90), alpha=.2) +
+  geom_ribbon(aes(ymin = q5, ymax = q95), alpha=.08) +
+  geom_ribbon(aes(ymin = q10, ymax = q90), alpha=.08) +
   xlab("Spawners (S)") +
   ylab("Recruits (R)") +
   geom_vline(xintercept = SMSY, color ="gray70", lty=2)+
   scale_y_continuous(labels = comma,breaks = seq(0, 500000, 50000), limits = c(0, 500000)) +
   scale_x_continuous(labels = comma,breaks = seq(0, 350000, 50000), limits = c(0, 350000)) +
-  geom_line(aes(x=Escapement, y=Escapement),linetype="solid", size=0.75, color ="black") +
+  geom_line(aes(x=Escapement, y=Escapement),linetype="solid", size=0.75, color ="gray80") +
   geom_point(data=parameters, aes(x=S_median, y=R_median),pch=1, size=2) +
-  geom_point(data=parameters_fig, aes(x=S_median, y=R_median),pch=16, size=3) -> plot1
-  #geom_text(size=3, data=parameters_fig, aes(x=S_median, y=R_median, label=year,family="serif",
-   #                                          hjust = -0.1, vjust= -0.4)) -> plot1
+  geom_point(data=parameters_fig, aes(x=S_median, y=R_median),pch=16, size=2) +
+  geom_text(size=3, data=(subset(parameters_fig, year>2012)), aes(x=S_median, y=R_median, label=year,family="serif",
+                                            hjust = -0.4, vjust= -0.6)) -> plot1
 cowplot::plot_grid(plot1,  align = "v", nrow = 1, ncol=1)
-ggsave("2023_analysis/figures/SR_curve.png", dpi = 500, height = 5, width = 8, units = "in")
+ggsave("2023_analysis/figures/SR_curve(b).png", dpi = 500, height = 5, width = 8, units = "in")
 
 # density plots
 ggplot(coda, aes(x=S.msy.c, fill=Smsy, color = S.msy.c)) +
