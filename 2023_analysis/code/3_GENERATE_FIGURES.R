@@ -21,6 +21,7 @@ library(scales)
 library(dplyr)
 library(extrafont)
 library(grid)
+library(ggrepel)
 library("devtools")
 devtools::install_github("commfish/fngr")
 library(fngr)
@@ -237,7 +238,7 @@ ggplot(data=CI, aes(x=Escapement, y=Median)) +
   geom_line(aes(x=Escapement, y=Escapement),linetype="solid", size=0.75, color ="gray80") +
   geom_point(data=parameters, aes(x=S_median, y=R_median),pch=1, size=2) +
   geom_point(data=parameters_fig, aes(x=S_median, y=R_median),pch=16, size=2) +
-  geom_text(size=3, data=(subset(parameters_fig, year>2012)), aes(x=S_median, y=R_median, label=year,family="serif",
+  geom_text_repel(size=3, data=(subset(parameters_fig, year>2012)), aes(x=S_median, y=R_median, label=year,family="serif",
                                             hjust = -0.4, vjust= -0.6)) -> plot1
 cowplot::plot_grid(plot1,  align = "v", nrow = 1, ncol=1)
 ggsave("2023_analysis/figures/SR_curve(b).png", dpi = 500, height = 5, width = 8, units = "in")
