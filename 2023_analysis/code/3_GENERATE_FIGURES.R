@@ -14,6 +14,7 @@ beta <-5.42E-06  #median from staquants file
 
 # load----
 library(tidyverse)
+library(viridis)
 library(cowplot)
 library(ggplot2)
 library(gsl)

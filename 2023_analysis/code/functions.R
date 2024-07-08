@@ -102,16 +102,16 @@ profile <-function(i,z,xa.start, xa.end,lnalpha.c, beta){
     gather(key="variable", value="value", -Escapement) %>% 
     mutate(sra = "Yield Profile",
            max_pct =ifelse(grepl("oy_0.7",variable), 
-                           0.7,
-                    ifelse(grepl("oy_0.8",variable),0.8, 0.9 )))-> my1
+                           "70% MSY",
+                    ifelse(grepl("oy_0.8",variable),"80% MSY", "90% MSY")))-> my1
   
   Y %>% 
     dplyr::select(Escapement, of_0.9, of_0.8, of_0.7) %>% 
     gather(key="variable", value="value", -Escapement) %>% 
     mutate(sra = "Overfishing Profile",
            max_pct =ifelse(grepl("of_0.7",variable), 
-                           0.7,
-                           ifelse(grepl("of_0.8",variable),0.8, 0.9)))-> my2
+                           "70% MSY",
+                           ifelse(grepl("of_0.8",variable),"80% MSY", "90% MSY")))-> my2
   
   
   Y %>% 
@@ -119,8 +119,8 @@ profile <-function(i,z,xa.start, xa.end,lnalpha.c, beta){
     gather(key="variable", value="value", -Escapement) %>% 
     mutate(sra = "Recruitment Profile",
            max_pct =ifelse(grepl("or_0.7",variable), 
-                           0.7,
-                           ifelse(grepl("or_0.8",variable),0.8, 0.9 )))-> my3
+                           "70% MSY",
+                           ifelse(grepl("or_0.8",variable),"80% MSY", "90% MSY")))-> my3
   
   
   my4<-rbind(my1, my2, my3)
@@ -193,31 +193,33 @@ ggsave("2023_analysis/figures/0.8_0.9_profile(a).png", dpi=200, dev='png', width
 
 # SEAK plot 
 theme_set(theme_report(base_family = "Times", base_size = 12))
-ggplot(fig_data1, aes(x = Escapement, y = Probability, linetype = max_pct)) + ggtitle("(c) Yield Profile") + 
+ggplot(fig_data1, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + ggtitle("(c) Yield Profile") + 
   annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
            inherit.aes = FALSE, fill = "grey80", alpha = 0.9) +
-  geom_line() +    theme(plot.title = element_text(size = 12, face = "bold"),
+  geom_line() + theme(plot.title = element_text(size = 12, face = "bold"),
                          strip.text.y = element_text(size=0),legend.position= "none") +
+  scale_color_viridis(discrete = TRUE) +
   scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
   scale_y_continuous(breaks = seq(0, 1, 0.25), limits = c(0, 1))+
   scale_linetype_discrete(name = "Percent of Max.") + xlab('Escapement (S)')+
   facet_grid(sra ~ .)  -> plot1
 
-ggplot(fig_data2, aes(x = Escapement, y = Probability, linetype = max_pct)) + 
+ggplot(fig_data2, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + 
   annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
            inherit.aes = FALSE, fill = "grey80", alpha = 0.9) + ggtitle("(a) Overfishing Profile") + 
   theme(plot.title = element_text(size = 12, face = "bold"),
-        strip.text.y = element_text(size=0),legend.position=c(0.89,0.80), legend.title = element_blank()) +
+        strip.text.y = element_text(size=0),legend.position=c(0.89,0.75), legend.title = element_blank()) +
   geom_line() + xlab('Escapement (S)') +
+  scale_color_viridis(discrete = TRUE) +
   scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
-  scale_linetype_discrete(name = "Percent of Max.") + 
   facet_grid(sra ~ .) -> plot2
 
-ggplot(fig_data3, aes(x = Escapement, y = Probability, linetype = max_pct)) + 
+ggplot(fig_data3, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + 
   annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
            inherit.aes = FALSE, fill = "grey80", alpha = 0.9) + ggtitle("(b) Recruitment Profile") + 
   geom_line() + xlab('Escapement (S)') +   theme(plot.title = element_text(size = 12, face = "bold"),
                                                  strip.text.y = element_text(size=0),legend.position= "none") +
+  scale_color_viridis(discrete = TRUE) +
   scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
   scale_linetype_discrete(name = "Percent of Max.") +
   facet_grid(sra ~ .)  -> plot3
