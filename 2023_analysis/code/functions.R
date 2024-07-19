@@ -149,6 +149,7 @@ ggplot(fig_data1, aes(x = Escapement, y = Probability, linetype = max_pct)) + gg
           strip.text.y = element_text(size=0),legend.position="none") +
     geom_line() +
     scale_y_continuous(breaks = seq(0, 1, 0.25), limits = c(0, 1))+
+    theme(text=element_text(size=17, family ="Times")) +
     scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
     scale_linetype_discrete(name = "Percent of Max.") + xlab('Escapement (S)')+
     facet_grid(sra ~ .) +geom_vline(xintercept=SMSY, lwd=1.25,colour="grey50") -> plot1
@@ -159,6 +160,7 @@ ggplot(fig_data2, aes(x = Escapement, y = Probability, linetype = max_pct)) +
     theme(plot.title = element_text(size = 12, face = "bold"),
           strip.text.y = element_text(size=0),legend.position=c(0.95,0.88), legend.title = element_blank()) +
     geom_line() + xlab('Escapement (S)') +
+    theme(text=element_text(size=17, family ="Times")) +
     scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
     scale_linetype_discrete(name = "Percent of Max.") + 
     facet_grid(sra ~ .) +geom_vline(xintercept=SMSY , lwd=1.25,colour="grey50")-> plot2
@@ -169,6 +171,7 @@ ggplot(fig_data3, aes(x = Escapement, y = Probability, linetype = max_pct)) +
   theme(plot.title = element_text(size = 12, face = "bold"),
   strip.text.y = element_text(size=0),legend.position= "none") +
     geom_line() + xlab('Escapement (S)') +  
+    theme(text=element_text(size=17, family ="Times")) +
     scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
     scale_linetype_discrete(name = "Percent of Max.") +
     facet_grid(sra ~ .) +geom_vline(xintercept=SMSY , lwd=1.25,colour="grey50") -> plot3
@@ -189,43 +192,7 @@ ggplot(my4, aes(x = Escapement, y = Probability, linetype = max_pct)) +
                              legend.key = element_blank(),text=element_text(family="Times New Roman"),
                              panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 options(scipen=99999)
-ggsave("2023_analysis/figures/0.8_0.9_profile(a).png", dpi=200, dev='png', width=7, height=6, units='in')
-
-# SEAK plot 
-theme_set(theme_report(base_family = "Times", base_size = 12))
-ggplot(fig_data1, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + ggtitle("(c) Yield Profile") + 
-  annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
-           inherit.aes = FALSE, fill = "grey80", alpha = 0.9) +
-  geom_line() + theme(plot.title = element_text(size = 12, face = "bold"),
-                         strip.text.y = element_text(size=0),legend.position= "none") +
-  scale_color_viridis(discrete = TRUE) +
-  scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
-  scale_y_continuous(breaks = seq(0, 1, 0.25), limits = c(0, 1))+
-  scale_linetype_discrete(name = "Percent of Max.") + xlab('Escapement (S)')+
-  facet_grid(sra ~ .)  -> plot1
-
-ggplot(fig_data2, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + 
-  annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
-           inherit.aes = FALSE, fill = "grey80", alpha = 0.9) + ggtitle("(a) Overfishing Profile") + 
-  theme(plot.title = element_text(size = 12, face = "bold"),
-        strip.text.y = element_text(size=0),legend.position=c(0.89,0.75), legend.title = element_blank()) +
-  geom_line() + xlab('Escapement (S)') +
-  scale_color_viridis(discrete = TRUE) +
-  scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
-  facet_grid(sra ~ .) -> plot2
-
-ggplot(fig_data3, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + 
-  annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
-           inherit.aes = FALSE, fill = "grey80", alpha = 0.9) + ggtitle("(b) Recruitment Profile") + 
-  geom_line() + xlab('Escapement (S)') +   theme(plot.title = element_text(size = 12, face = "bold"),
-                                                 strip.text.y = element_text(size=0),legend.position= "none") +
-  scale_color_viridis(discrete = TRUE) +
-  scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
-  scale_linetype_discrete(name = "Percent of Max.") +
-  facet_grid(sra ~ .)  -> plot3
-cowplot::plot_grid(plot2,plot3,plot1, align = "v", nrow = 3, ncol=1) 
-ggsave("2023_analysis/figures/0.8_0.9_profile(b).png", dpi=200, dev='png', width=7, height=6, units='in')
-
+ggsave("2023_analysis/figures/0.8_0.9_profile.png", dpi=200, dev='png', width=7, height=6, units='in')
 
 # EXPECTED SUSTAINED YIELD 
 out.file <- paste0("2023_analysis/figures/expect_yield.png")
@@ -272,4 +239,41 @@ ggplot(fig_data3, aes(x = Escapement, y = Probability, linetype = max_pct)) +
 
 cowplot::plot_grid(plot2,plot3,plot1, align = "v", nrow = 3, ncol=1) 
 ggsave("2023_analysis/figures/profiles2.png", dpi = 500, height = 8, width = 9, units = "in")
-}
+
+# SEAK plot 
+theme_set(theme_report(base_family = "Times", base_size = 12))
+ggplot(fig_data1, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + ggtitle("(c) Yield Profile") + 
+  annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
+           inherit.aes = FALSE, fill = "grey80", alpha = 0.9) +
+  geom_line(size=1) + theme(plot.title = element_text(size = 15, face = "bold"),
+                         strip.text.y = element_text(size=0),legend.position= "none") +
+  scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
+  scale_y_continuous(breaks = seq(0, 1, 0.25), limits = c(0, 1)) + scale_color_viridis(discrete = TRUE) +
+  scale_linetype_discrete(name = "Percent of Max.") + xlab('Escapement (S)')+
+  theme(text=element_text(size=15, family="Times")) +
+  facet_grid(sra ~ .)  -> plot1
+
+ggplot(fig_data2, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + 
+  annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
+           inherit.aes = FALSE, fill = "grey80", alpha = 0.9) + ggtitle("(a) Overfishing Profile") + 
+  theme(plot.title = element_text(size = 15, face = "bold"),
+        strip.text.y = element_text(size=0),legend.position=c(0.89,0.75), legend.title = element_blank()) +
+  geom_line(size=1) + xlab('Escapement (S)') +
+  scale_color_viridis(discrete = TRUE) +
+  scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
+  #scale_linetype_discrete(name = "Percent of Max.") + 
+  theme(text=element_text(size=15, family="Times")) +
+  facet_grid(sra ~ .) -> plot2
+
+ggplot(fig_data3, aes(x = Escapement, y = Probability, linetype = max_pct, col = max_pct)) + 
+  annotate("rect", xmin = 70000, xmax = 150000, ymin = 0, ymax = 1,
+           inherit.aes = FALSE, fill = "grey80", alpha = 0.9) + ggtitle("(b) Recruitment Profile") + 
+  geom_line(size=1) + xlab('Escapement (S)') +   theme(plot.title = element_text(size = 15, face = "bold"),
+                                                 strip.text.y = element_text(size=0),legend.position= "none") +
+  scale_x_continuous(labels = comma, breaks = seq(0, 350000, 50000), limits = c(0, 350000))+
+  scale_linetype_discrete(name = "Percent of Max.") +scale_color_viridis(discrete = TRUE) +
+  theme(text=element_text(size=15, family="Times")) +
+  facet_grid(sra ~ .)  -> plot3
+cowplot::plot_grid(plot2,plot3,plot1, align = "v", nrow = 3, ncol=1)}
+#ggsave("2023_analysis/figures/SEAK_report.png", dpi = 500, height = 8, width = 9, units = "in")}
+
