@@ -54,10 +54,10 @@ count_pct <- function(df) {
 # impute_local() which imputes a 10-year rolling imputation (prev & following 5 years)
 # impute_local_improved which is similar to impute_local() but accounts for early years better
 
+# global impute #
 impute_global <- function(dfname, Year_column="year", DateName_column="date",
                          outputname = "globalimpute", # Only used if Step 3 turned "on"
                          Count_column = "total_count"){
-  ### SUMMARY: Global Impute ###
   # This creates a dataframe that imputes NA values.
   # This algorithm interpolates across rows and columns, following Blick
   # In essence, imputing across rows (years) and columns (streams) allows for an NA in
@@ -98,9 +98,10 @@ impute_global <- function(dfname, Year_column="year", DateName_column="date",
   write.csv(.test, "coho_apportionment/example/global_imputed.csv")
 }
 
+# 10-yr Localized Imputation #
 impute_local <- function(dfname, Year_column="year", DateName_column="date",
                          Count_column = "total_count"){
-  ### SUMMARY: 10-yr Localized Imputation ###
+
   # This takes a dataframe with NA values and imputes missing data
   # This algorithm uses "local" imputation: only 5 years before and after impute a missing value
   # i.e., only using the preceding 5 years and following 5 years
@@ -140,9 +141,10 @@ impute_local <- function(dfname, Year_column="year", DateName_column="date",
 
 }
 
+# 10-yr Localized Imputation, improved #
 impute_local_improved <- function(dfname, Year_column="year", DateName_column="date",
                                   Count_column = "total_count"){
-  ### SUMMARY: 10-yr Localized Imputation, improved ###
+
   # This takes a dataframe with NA values and imputes missing data
   # This algorithm uses "local" imputation: only 5 years before and after impute a missing value
   # i.e., only using the preceding 5 years and following 5 years

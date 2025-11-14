@@ -19,7 +19,6 @@ df_long <- situk %>%
 # run functions ----
 impute_global(df_long)
 impute_local(df_long)
-#impute_local_improved(df_long)
 
 # read and save output in wide format----
 read.csv("coho_apportionment/example/global_imputed.csv") %>%
@@ -30,7 +29,6 @@ read.csv("coho_apportionment/example/global_imputed.csv") %>%
     values_from = total_count) %>%
   arrange(date) %>%                           # sort by date
   write.csv("coho_apportionment/example/global_imputed_transform.csv")
-
 
 read.csv("coho_apportionment/example/local_imputed.csv") %>%
   distinct(date, year, .keep_all = TRUE) %>%  # remove duplicates
