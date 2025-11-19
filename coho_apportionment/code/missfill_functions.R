@@ -200,5 +200,21 @@ impute_local_improved <- function(dfname, Year_column="year", DateName_column="d
   write.csv(.test, "coho_apportionment/output/local_imputed_improved_matrix.csv")
 }
 
+# Depends on dplyr
+tickr <- function(
+    data, # dataframe
+    var, # column of interest
+    to # break point definition 
+){
+  
+  VAR <- enquo(var) # makes VAR a dynamic variable
+  
+  data %>% 
+    distinct(!!VAR) %>%
+    #    ungroup(!!VAR) %>% 
+    mutate(labels = ifelse(!!VAR %in% seq(to * round(min(!!VAR) / to), max(!!VAR), to),
+                           !!VAR, "")) %>%
+    dplyr::select(breaks = UQ(VAR), labels)
+}
 
 
