@@ -95,7 +95,7 @@ impute_global <- function(dfname, Year_column="year", DateName_column="date",
   }
   print(.test)
 
-  write.csv(.test, "coho_apportionment/output/global_imputed.csv")
+  write.csv(.test, "coho_apportionment/example/global_imputed.csv")
 }
 
 # 10-yr Localized Imputation #
@@ -137,7 +137,7 @@ impute_local <- function(dfname, Year_column="year", DateName_column="date",
   }
   print(.test)
 
-  write.csv(.test, "coho_apportionment/output/local_imputed.csv")
+  write.csv(.test, "coho_apportionment/example/local_imputed.csv")
 
 }
 
@@ -197,7 +197,7 @@ impute_local_improved <- function(dfname, Year_column="year", DateName_column="d
     if(j>50){break} # repeat the above 50 times. Needs to be iterative (imputing depends on other imputed values)
   } # end late
   print(.test)
-  write.csv(.test, "coho_apportionment/output/local_imputed_improved_matrix.csv")
+  write.csv(.test, "coho_apportionment/example/local_imputed_improved_matrix.csv")
 }
 
 
