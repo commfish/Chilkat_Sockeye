@@ -66,7 +66,7 @@ theme_sleek <- function(base_size = 12, base_family = "Times") {
 theme_set(theme_sleek())
 read.csv("coho_apportionment/output/global_imputed_fig.csv") %>%
   ggplot(aes(x = date, y = total_count,
-             color = ifelse(year == 2025, "2025", "2021-2024"),
+             color = ifelse(year == 2025, "2025", "2018-2024"),
              group = year)) +
   geom_line() +
   scale_x_continuous(limits = c(min(tickryr$date), max(tickryr$date)),
