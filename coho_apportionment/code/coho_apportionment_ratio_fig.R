@@ -1,44 +1,10 @@
-# missfill code
+# using the proportions, create the coho_daily_wide_count.csv file
 
 # load ----
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-source('coho_apportionment/code/missfill_functions.r')
-
-# data ----
-read.csv('coho_apportionment/data/chilkat_coho.csv')-> chilkat
-
-# pivot year columns into long format for import into functions
-df_long <- chilkat %>%
-  pivot_longer(
-    cols = -date,    # all year columns now start with 'x'
-    names_to = "year",
-    values_to = "total_count") %>%
-  mutate(year = as.numeric(sub("X", "", year)))
-
-# run functions ----
-impute_global(df_long) #imputes all NAs in all years iteratively
-#impute_local(df_long) #imputes a 10-year rolling imputation (prev & following 5 years)
-
-# read and save output in wide format----
-read.csv("coho_apportionment/output/global_imputed.csv") %>%
-  distinct(date, year, .keep_all = TRUE) %>%  # remove duplicates
-  pivot_wider(
-    id_cols = date,
-    names_from = year,
-    values_from = total_count) %>%
-  arrange(date) %>%                           # sort by date
-  write.csv("coho_apportionment/output/global_imputed_transform.csv")
-
-# read.csv("coho_apportionment/output/local_imputed.csv") %>%
-#   distinct(date, year, .keep_all = TRUE) %>%  # remove duplicates
-#   pivot_wider(
-#     id_cols = date,
-#     names_from = year,
-#     values_from = total_count) %>%
-#   arrange(date) %>%                           # sort by date
-#   write.csv("coho_apportionment/output/local_imputed_transform.csv")
+library(readr)
 
 # create a figure 
 tickryr <- data.frame(date = 160:300)
@@ -61,8 +27,22 @@ theme_sleek <- function(base_size = 12, base_family = "Times") {
     )
 }
 
-# recreate the fig sheet to match the raw data with the new rounded up values
-# added to the fig sheet; do this by-hand; haven't coded this part yet
+read.csv('coho_apportionment/data/coho_daily_wide_count.csv')-> wide
+
+long <- wide %>%
+  pivot_longer(
+    cols            = -JD,
+    names_to        = "year",
+    values_to       = "total_count",
+    names_transform = list(year = readr::parse_number)
+  ) %>%
+  rename(date = JD) %>%
+  select(year, date, total_count) %>%
+  arrange(year, date)%>%
+  as.data.frame
+
+write.csv(long, "coho_apportionment/output/global_imputed_fig.csv")
+
 theme_set(theme_sleek())
 read.csv("coho_apportionment/output/global_imputed_fig.csv") %>%
   ggplot(aes(x = date, y = total_count,
@@ -79,4 +59,7 @@ read.csv("coho_apportionment/output/global_imputed_fig.csv") %>%
   geom_vline(xintercept = 250, linetype = "dashed", color = "black")-> fig
 
 ggsave(paste0("coho_apportionment/output/coho_missfill.png"), plot = fig, dpi = 500, height = 4, width = 7, units = "in")
-  
+
+
+
+
