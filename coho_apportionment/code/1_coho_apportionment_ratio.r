@@ -1,4 +1,8 @@
-# missfill code
+# coho apportionment (missfill) for Chilkat sockeye weir
+# this file is used to apportion the coho, sockeye counts at the Chilkat weir
+# when seine is unavailable for an extended amount of time
+# script written by Sara Miller (sara.miller@alaska.gov) 
+# November 2026
 
 # load ----
 library(dplyr)
@@ -20,7 +24,7 @@ df_long <- chilkat %>%
 
 # run functions ----
 impute_global(df_long) #imputes all NAs in all years iteratively
-#impute_local(df_long) #imputes a 10-year rolling imputation (prev & following 5 years)
+#impute_local(df_long) #imputes a 10-year rolling imputation (prev & following 5 years) [not tested]
 
 # read and save output in wide format----
 read.csv("coho_apportionment/output/global_imputed.csv") %>%
