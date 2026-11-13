@@ -15,7 +15,7 @@ duplicaterows <- function(dataframename, duplicatecolname = "specimen_count", re
   # Often though, we will want to run stats on our data which require it to NOT be summarized
   # This function takes summarized data and adds rows based on the count column
   
-  # Using replacenaswithone allows you to decide whether an NA in the count column were really a count of 1
+  # Using replace nas with one allows you to decide whether an NA in the count column were really a count of 1
   # Carefully use this because most often an NA is a true zero.
   
   require(tidyverse)

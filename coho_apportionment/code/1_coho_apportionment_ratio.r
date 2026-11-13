@@ -1,9 +1,8 @@
 # coho apportionment (missfill) for Chilkat sockeye weir
-# this file is used to apportion the coho, sockeye counts at the Chilkat weir
-# when seine is unavailable for an extended amount of time
-# it imputes missing daily coho ratios (coho / total weir count) within each season
+# this file is used to apportion the coho/sockeye counts at the Chilkat Lake weir
+# when seine is unavailable for an extended amount of time, it imputes missing daily coho ratios (coho / total weir count) within each season
 # script written by Sara Miller (sara.miller@alaska.gov)
-# November 2026
+# last updated: November 2026
 
 # load ----
 library(dplyr)
