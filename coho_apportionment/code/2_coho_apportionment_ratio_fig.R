@@ -5,7 +5,7 @@
 # the file coho_daily_wide_count.csv needs to be created based on the data file located
 # here: C:\chilkat_sockeye\coho_apportionment\data\raw_files
 
-# load ----
+#  load ----
 library(dplyr)
 library(tidyr)
 library(ggplot2)
@@ -40,9 +40,9 @@ wide <- read.csv('coho_apportionment/output/coho_daily_wide_count.csv')
 
 long <- wide %>%
   pivot_longer(
-    cols            = -JD,
-    names_to        = "year",
-    values_to       = "total_count",
+    cols = -JD,
+    names_to = "year",
+    values_to = "total_count",
     names_transform = list(year = readr::parse_number)) %>%
   rename(date = JD) %>%
   select(year, date, total_count) %>%
@@ -70,7 +70,7 @@ fig <- ggplot(plot_data, aes(x = date, y = total_count, color = group_label, gro
   scale_color_manual(values = setNames(c("red", "grey60"),
                                        c(as.character(focus_year), other_label))) +
   labs(x = "Julian day", y = "Coho count", color = NULL) +
-  theme(legend.position = "inside", legend.position.inside = c(0.1, 0.8))
+  theme(legend.position = "inside", legend.position.inside = c(0.2, 0.8))
 
 ggsave("coho_apportionment/output/coho_missfill.png", plot = fig,
        dpi = 500, height = 4, width = 7, units = "in")
